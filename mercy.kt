@@ -115,6 +115,7 @@ class mercy : AppCompatActivity() {
             builder.setPositiveButton("Yes" ,{dialog, which ->
                 arrayLists?.removeAt(listPosition)
                 helperinos?.notifyDataSetChanged()
+                Toast.makeText(this, "Song removed", Toast.LENGTH_SHORT).show()
                 dialog.dismiss()})
             builder.setNegativeButton("No" ,{dialog, which -> dialog.dismiss()})
             builder.setNeutralButton("Cancel", {dialog, which -> dialog.dismiss() })
