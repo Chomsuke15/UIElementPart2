@@ -3,19 +3,18 @@ package com.example.helppls
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.widget.AdapterView
 import android.widget.BaseAdapter
 import android.widget.ListView
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 
 class Queue : AppCompatActivity() {
-    private var listView: ListView? = null
+
     private var MedyoAdapter: medyoAdapter? = null
-    private var arrayList: ArrayList<MainActivity.songs>? = null
+    private var arrayLists: ArrayList<MainActivity.songs>? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,21 +23,22 @@ class Queue : AppCompatActivity() {
 
 
 
-        val listView = findViewById<ListView>(R.id.listt)
-        arrayList = ArrayList()
+        val listViews = findViewById<ListView>(R.id.listt)
+        arrayLists = ArrayList()
 
         MedyoAdapter = medyoAdapter(applicationContext, addToCart!!)
-        listView?.adapter = MedyoAdapter
+        listViews?.adapter = MedyoAdapter
+        registerForContextMenu(listViews)
 
 
     }
 
 
 
-    private class medyoAdapter (context: Context, var arrayList: ArrayList<MainActivity.songs>) : BaseAdapter() {
+    private class medyoAdapter (context: Context, var arrayLists: ArrayList<MainActivity.songs>) : BaseAdapter() {
         val mContext: Context = context
         override fun getItem(position: Int): Any {
-            return arrayList.get(position)
+            return arrayLists.get(position)
         }
 
         override fun getItemId(position: Int): Long {
@@ -46,12 +46,12 @@ class Queue : AppCompatActivity() {
         }
 
         override fun getCount(): Int {
-            return arrayList.size
+            return arrayLists.size
         }
         override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
             val view: View = View.inflate(mContext, R.layout.helplayout, null)
             var titleText: TextView = view.findViewById(R.id.mercyTitle)
-            var songList: MainActivity.songs = arrayList.get(position)
+            var songList: MainActivity.songs = arrayLists.get(position)
 
             titleText.text = songList.title
             return view!!
@@ -77,5 +77,49 @@ class Queue : AppCompatActivity() {
         }
    return true
     }
+    override fun onCreateContextMenu(
+            smenu: ContextMenu?,
+            v: View?,
+            menuInfo: ContextMenu.ContextMenuInfo?
+    ) {
+    super.onCreateContextMenu(smenu, v, menuInfo)
+    smenu!!.setHeaderTitle("Delete?")
+    smenu.add(0, v!!.id, 0, "Delete")
+    smenu.add(0, v!!.id, 1, "Refresj")
+
+}
+override fun onContextItemSelected(item: MenuItem): Boolean {
+    val selectedItemOrder = item!!.order
+    val info = item.menuInfo as AdapterView.AdapterContextMenuInfo
+    val listPosition = info.position
+    if (selectedItemOrder == 0)
+    {
+
+        var count = 0
+
+        val builder:AlertDialog.Builder = AlertDialog.Builder(this)
+        builder.setTitle("Delete from Queue")
+        builder.setMessage("Are you sure you would like to remove this song from the queue?")
+        builder.setPositiveButton("Yes" ,{dialog, which ->
+            addToCart?.removeAt(listPosition)
+            MedyoAdapter?.notifyDataSetChanged()
+            dialog.dismiss()})
+        builder.setNegativeButton("No" ,{dialog, which -> dialog.dismiss()})
+        builder.setNeutralButton("Cancel", {dialog, which -> dialog.dismiss() })
+
+        val alertDialog:AlertDialog = builder.create()
+        alertDialog.show()
+
+        count ++
+
+
+    }
+    else if (selectedItemOrder == 1)
+    {
+
+    }
+
+    return true
+}
 
 }
