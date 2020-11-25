@@ -8,11 +8,15 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.*
 import android.widget.*
+import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.content.ContextCompat.startActivity
+import com.google.android.material.snackbar.Snackbar
 import org.w3c.dom.Text
 var listView: ListView? = null
 var helperino: Helperino? = null
 var arrayList: ArrayList<MainActivity.songs>? = null
 var addToCart: ArrayList<MainActivity.songs>?= null
+var count = 0
 class MainActivity : AppCompatActivity() {
 
 
@@ -43,13 +47,17 @@ class MainActivity : AppCompatActivity() {
         when(item.itemId){
             R.id.Add -> {
                 val intent = Intent(this, Albums::class.java)
+                startActivity(intent)
+
+
             }
             R.id.Play ->{
                 val intent = Intent(this, Queue::class.java)
                 startActivity(intent)
-                intent.putExtra("queue", addToCart);
+                intent.putExtra("queue", addToCart)
             }
         }
+
 
 
 
@@ -89,6 +97,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
+
     class songs {
         var title: String? = null
         var artist: String? = null
@@ -108,7 +117,6 @@ class MainActivity : AppCompatActivity() {
         menu!!.setHeaderTitle("Select")
         menu.add(0, v!!.id, 0, "Add to queue")
         menu.add(9, v!!.id, 1, "Play")
-        menu.add(9, v!!.id, 2, "View Queue")
     }
     override fun onContextItemSelected(item: MenuItem): Boolean {
         val selectedItemOrder = item!!.order
@@ -116,18 +124,19 @@ class MainActivity : AppCompatActivity() {
         val listPosition = info.position
         if (selectedItemOrder == 0)
         {
-            var count = 0
+
 
                 addToCart?.add(arrayList!![listPosition])
-          
+
                 count++
-             val snackbar = Snackbar.make (findViewById(R.id.aLayout), "Song added to Queue", Snackbar.LENGTH_LONG)
+
+
+            val snackbar = Snackbar.make (findViewById(R.id.aLayout), "this is library", Snackbar.LENGTH_LONG)
             snackbar.setAction("Go to Queue", View.OnClickListener {
                 val intent = Intent(this, Queue::class.java)
                 startActivity(intent)
             })
             snackbar.show()
-
         }
         else if (selectedItemOrder == 2)
         {
