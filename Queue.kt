@@ -1,13 +1,19 @@
 package com.example.helppls
 
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
+import android.graphics.Color.GREEN
+import android.graphics.Color.parseColor
+import android.os.Build
 import android.os.Bundle
 import android.view.*
-import android.widget.AdapterView
-import android.widget.BaseAdapter
-import android.widget.ListView
-import android.widget.TextView
+import android.widget.*
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 
@@ -15,8 +21,14 @@ class Queue : AppCompatActivity() {
 
     private var MedyoAdapter: medyoAdapter? = null
     private var arrayLists: ArrayList<MainActivity.songs>? = null
+    lateinit var notificationManager: NotificationManager
+    lateinit var notificationChannel: NotificationChannel
+    lateinit var notibuilder: Notification.Builder
+    private val channelId = "package com.example.helppls"
+    private val description = "Notifies when song Queue is empty"
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_queue)
@@ -29,6 +41,12 @@ class Queue : AppCompatActivity() {
         MedyoAdapter = medyoAdapter(applicationContext, addToCart!!)
         listViews?.adapter = MedyoAdapter
         registerForContextMenu(listViews)
+
+
+
+
+
+
 
 
     }
@@ -95,7 +113,7 @@ override fun onContextItemSelected(item: MenuItem): Boolean {
     if (selectedItemOrder == 0)
     {
 
-        var count = 0
+        var counts = 0
 
         val builder:AlertDialog.Builder = AlertDialog.Builder(this)
         builder.setTitle("Delete from Queue")
@@ -104,6 +122,8 @@ override fun onContextItemSelected(item: MenuItem): Boolean {
             addToCart?.removeAt(listPosition)
             MedyoAdapter?.notifyDataSetChanged()
             Toast.makeText(this, "Song removed", Toast.LENGTH_SHORT).show()
+            count--
+            check()
             dialog.dismiss()})
         builder.setNegativeButton("No" ,{dialog, which -> dialog.dismiss()})
         builder.setNeutralButton("Cancel", {dialog, which -> dialog.dismiss() })
@@ -111,7 +131,8 @@ override fun onContextItemSelected(item: MenuItem): Boolean {
         val alertDialog:AlertDialog = builder.create()
         alertDialog.show()
 
-        count ++
+
+        counts ++
 
 
     }
@@ -122,5 +143,41 @@ override fun onContextItemSelected(item: MenuItem): Boolean {
 
     return true
 }
+    fun check()
+    {
+        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        if (count == 0)
+        {
+            val intent = Intent(this, MainActivity::class.java)
+            val pendingIntent = PendingIntent.getActivity(this,0,intent,PendingIntent.FLAG_UPDATE_CURRENT)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            {
+                notificationChannel= NotificationChannel(channelId,description,NotificationManager.IMPORTANCE_HIGH)
+                notificationChannel.enableLights(true)
+                notificationChannel.lightColor = parseColor("#00ff00")
+                notificationChannel.enableVibration(false)
+                notificationManager.createNotificationChannel(notificationChannel)
+                notibuilder = Notification.Builder(this,channelId)
+                        .setContentTitle("Empty Queue")
+                        .setContentText("Song Queue has no songs stored")
+                        .setSmallIcon(R.drawable.ic_launcher_round)
+                        // .setLargeIcon(BitmapFactory.decodeResource(this, resources, R.drawable.ic_launcher))
+                        .setContentIntent(pendingIntent)
+
+            }
+            else {
+                notibuilder = Notification.Builder(this)
+                        .setContentTitle("Empty Queue")
+                        .setContentText("Song Queue has no songs stored")
+                        .setSmallIcon(R.drawable.ic_launcher_round)
+                        //  .setLargeIcon(BitmapFactory.decodeResource(this,resources, R.drawable.ic_launcher))
+                        .setContentIntent(pendingIntent)
+            }
+            notificationManager.notify(1324, notibuilder.build())
+
+
+
+        }
+    }
 
 }
