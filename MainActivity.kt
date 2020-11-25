@@ -119,8 +119,14 @@ class MainActivity : AppCompatActivity() {
             var count = 0
 
                 addToCart?.add(arrayList!![listPosition])
-                Toast.makeText(this, addToCart!![count].title, Toast.LENGTH_SHORT).show()
+          
                 count++
+             val snackbar = Snackbar.make (findViewById(R.id.aLayout), "Song added to Queue", Snackbar.LENGTH_LONG)
+            snackbar.setAction("Go to Queue", View.OnClickListener {
+                val intent = Intent(this, Queue::class.java)
+                startActivity(intent)
+            })
+            snackbar.show()
 
         }
         else if (selectedItemOrder == 2)
